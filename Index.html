@@ -1,0 +1,1010 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Step Forward — Інтернет-магазин взуття</title>
+<meta name="description" content="Step Forward — інтернет-магазин взуття для чоловіків, жінок та дітей.">
+<meta name="theme-color" content="#ea580c">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://images.unsplash.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+  :root { --brand:#ea580c; --soft:#f7f7f5; }
+  body { font-family:'Inter', system-ui, sans-serif; background:var(--soft); }
+  html { scroll-behavior:smooth; }
+  .sr-only { position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0; }
+  [inert] { pointer-events:none; user-select:none; }
+  input[type="range"], input[type="checkbox"] { accent-color:var(--brand); }
+  .filters-panel { transition:transform .3s ease; }
+  @media (min-width:768px) { .filters-panel { transform:none !important; transition:none !important; } }
+  .slider-img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; opacity:0; transition:opacity 1.5s ease-in-out, transform 6s ease-out; transform:scale(1.05); z-index:1; }
+  .slider-img.active { opacity:1; transform:scale(1); z-index:2; }
+  .section-eyebrow { letter-spacing:.18em; font-size:.72rem; font-weight:800; text-transform:uppercase; color:var(--brand); }
+  .product-card { transition:transform .3s ease, box-shadow .3s ease; }
+  .product-card:hover { transform:translateY(-4px); }
+  .icon-btn { width:40px; height:40px; display:inline-flex; align-items:center; justify-content:center; border-radius:999px; background:rgba(255,255,255,.94); box-shadow:0 4px 16px rgba(0,0,0,.12); }
+  .bottom-nav { padding-bottom:env(safe-area-inset-bottom); }
+  .modal-backdrop { background:rgba(0,0,0,.62); backdrop-filter:blur(4px); }
+  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior:auto !important; transition-duration:.01ms !important; } .slider-img { transition:none; } }
+  .checkout-input { width:100%; min-height:56px; padding:.85rem 1rem; border:1px solid #d1d5db; border-radius:14px; background:#fff; font-size:1rem; outline:none; }
+  .checkout-input:focus { border-color:#f97316; box-shadow:0 0 0 3px rgba(249,115,22,.14); }
+  .slider-dot { width:10px; height:10px; border-radius:999px; background:rgba(255,255,255,.45); transition:background .2s, width .2s; }
+  .slider-dot[aria-current="true"] { background:#fff; width:28px; }
+  .skeleton { background:linear-gradient(90deg,#eee 25%,#f5f5f5 37%,#eee 63%); background-size:400% 100%; animation:skeleton 1.4s ease infinite; }
+  @keyframes skeleton { 0%{background-position:100% 50%} 100%{background-position:0 50%} }
+  .product-media .img-alt { opacity:0; transition:opacity .45s ease; }
+  .product-card:hover .product-media .img-alt { opacity:1; }
+</style>
+</head>
+<body class="bg-gray-50 text-gray-800 antialiased flex flex-col min-h-screen">
+
+<a href="#catalog-products" class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-[100] focus:bg-white focus:px-4 focus:py-2 focus:rounded focus:font-semibold focus:text-orange-700" data-i18n="ui.skip">Перейти до вмісту</a>
+
+<nav class="fixed top-0 w-full bg-white/95 backdrop-blur-md shadow-sm z-50">
+  <div class="max-w-7xl mx-auto px-2 sm:px-6 lg:px-8">
+    <div class="flex justify-between h-16 items-center">
+      <div class="flex items-center gap-1 sm:gap-3">
+        <button id="menuBtn" type="button" aria-label="Меню" aria-controls="mobileMenu" aria-expanded="false" class="md:hidden p-2 text-gray-700 rounded">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+        </button>
+        <a href="#" class="flex-shrink-0 flex items-center" aria-label="Step Forward">
+          <span class="font-black text-lg sm:text-2xl tracking-tighter">STEP<span class="text-orange-600">FORWARD</span></span>
+        </a>
+      </div>
+      <div class="hidden md:flex space-x-8">
+        <a href="#" class="text-gray-900 font-medium hover:text-orange-700" data-i18n="nav.new">Новинки</a>
+        <a href="#" data-category="men" class="text-gray-600 font-medium hover:text-orange-700" data-i18n="nav.men">Чоловікам</a>
+        <a href="#" data-category="women" class="text-gray-600 font-medium hover:text-orange-700" data-i18n="nav.women">Жінкам</a>
+        <a href="#" data-category="kids" class="text-gray-600 font-medium hover:text-orange-700" data-i18n="nav.kids">Дітям</a>
+      </div>
+      <div class="flex items-center gap-1 sm:gap-3">
+        <div role="group" aria-label="Language" class="flex items-center rounded border border-gray-200 overflow-hidden bg-gray-50">
+          <button type="button" data-lang="uk" class="lang-btn px-2 py-1 text-xs font-bold" aria-pressed="true">UK</button>
+          <button type="button" data-lang="ru" class="lang-btn px-2 py-1 text-xs font-bold border-l border-r border-gray-200" aria-pressed="false">RU</button>
+          <button type="button" data-lang="en" class="lang-btn px-2 py-1 text-xs font-bold" aria-pressed="false">EN</button>
+        </div>
+        <button id="cartBtn" type="button" aria-label="Кошик" class="relative p-2 rounded" data-i18n-aria="ui.openCart">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/></svg>
+          <span id="cartBadge" class="absolute top-1 right-1 inline-flex items-center justify-center w-4 h-4 text-[9px] font-bold text-white transform translate-x-1/4 -translate-y-1/4 bg-orange-600 rounded-full hidden" aria-live="polite">0</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<div id="mobileMenu" role="dialog" aria-modal="true" aria-label="Меню" inert class="fixed inset-0 z-[90] opacity-0 pointer-events-none transition-opacity duration-300">
+  <div class="absolute inset-0 bg-black/50" data-close-menu></div>
+  <div id="mobileMenuPanel" class="relative w-80 max-w-[85vw] h-full bg-white shadow-2xl p-6 flex flex-col -translate-x-full transition-transform duration-300">
+    <div class="flex justify-between items-center mb-8">
+      <span class="font-black text-xl">STEP<span class="text-orange-600">FORWARD</span></span>
+      <button type="button" data-close-menu aria-label="Закрити" class="p-2 text-gray-600 rounded">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <nav class="flex flex-col gap-1">
+      <a href="#" data-close-menu class="py-3 px-2 rounded-lg font-semibold text-gray-900 hover:bg-orange-50" data-i18n="nav.new">Новинки</a>
+      <a href="#" data-category="men" data-close-menu class="py-3 px-2 rounded-lg font-semibold text-gray-700 hover:bg-orange-50" data-i18n="nav.men">Чоловікам</a>
+      <a href="#" data-category="women" data-close-menu class="py-3 px-2 rounded-lg font-semibold text-gray-700 hover:bg-orange-50" data-i18n="nav.women">Жінкам</a>
+      <a href="#" data-category="kids" data-close-menu class="py-3 px-2 rounded-lg font-semibold text-gray-700 hover:bg-orange-50" data-i18n="nav.kids">Дітям</a>
+    </nav>
+  </div>
+</div>
+
+<header id="hero" class="relative w-full bg-zinc-900 mt-16 shadow-md overflow-hidden min-h-[480px] h-[75vh] flex flex-col">
+  <div id="heroSlider" class="absolute inset-0">
+    <img src="https://images.unsplash.com/photo-1542291026-7eec264c27ff?q=80&w=1600&auto=format&fit=crop" alt="Step Forward" class="slider-img active" fetchpriority="high">
+    <img src="https://images.unsplash.com/photo-1515955656352-a1fa3ffcd111?q=80&w=1600&auto=format&fit=crop" alt="Step Forward" class="slider-img" loading="lazy">
+    <img src="https://images.unsplash.com/photo-1505784045224-1247b2b29cf3?q=80&w=1600&auto=format&fit=crop" alt="Step Forward" class="slider-img" loading="lazy">
+    <img src="https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?q=80&w=1600&auto=format&fit=crop" alt="Step Forward" class="slider-img" loading="lazy">
+  </div>
+  <div class="absolute inset-0 bg-gradient-to-r from-black/75 via-black/35 to-black/10 z-10"></div>
+  <div class="absolute inset-0 bg-gradient-to-t from-black/65 via-transparent to-black/15 z-10"></div>
+  <button id="sliderPrev" type="button" aria-label="Prev slide" class="hidden sm:inline-flex icon-btn absolute left-4 top-1/2 -translate-y-1/2 z-30">
+    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+  </button>
+  <button id="sliderNext" type="button" aria-label="Next slide" class="hidden sm:inline-flex icon-btn absolute right-4 top-1/2 -translate-y-1/2 z-30">
+    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+  </button>
+  <div id="sliderDots" class="absolute bottom-6 left-1/2 -translate-x-1/2 z-30 flex items-center gap-2"></div>
+  <div class="relative z-20 h-full max-w-7xl mx-auto px-4 sm:px-8 lg:px-12 flex items-center">
+    <div class="max-w-3xl text-white w-full">
+      <p class="section-eyebrow !text-orange-400 mb-3" data-i18n="banner.eyebrow">PREMIUM FOOTWEAR · CITY & OUTDOOR</p>
+      <h1 class="text-[2.25rem] sm:text-6xl lg:text-8xl font-black uppercase tracking-tight leading-[1.05]">
+        <span data-i18n="banner.titleL1">Твій шлях.</span><br>
+        <span data-i18n="banner.titleL2">Твоя стихія.</span>
+      </h1>
+      <p class="mt-4 text-sm sm:text-xl text-white/85 max-w-xl" data-i18n="banner.subtitle">Взуття для міста та активного відпочинку</p>
+      <div class="mt-6 grid grid-cols-3 gap-2 sm:flex sm:gap-3 w-full sm:w-max">
+        <a href="#catalog" data-hero-category="men" class="inline-flex items-center justify-center rounded-full bg-orange-600 hover:bg-orange-500 text-white font-bold px-2 sm:px-6 py-3 text-xs sm:text-base">
+          <span class="sm:hidden" data-i18n="nav.men">Чоловікам</span>
+          <span class="hidden sm:inline" data-i18n="banner.shopMen">Для чоловіків</span>
+        </a>
+        <a href="#catalog" data-hero-category="women" class="inline-flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 backdrop-blur border border-white/40 text-white font-bold px-2 sm:px-6 py-3 text-xs sm:text-base">
+          <span class="sm:hidden" data-i18n="nav.women">Жінкам</span>
+          <span class="hidden sm:inline" data-i18n="banner.shopWomen">Для жінок</span>
+        </a>
+        <a href="#catalog" data-hero-category="kids" class="inline-flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 backdrop-blur border border-white/40 text-white font-bold px-2 sm:px-6 py-3 text-xs sm:text-base">
+          <span class="sm:hidden" data-i18n="nav.kids">Дітям</span>
+          <span class="hidden sm:inline" data-i18n="banner.shopKids">Для дітей</span>
+        </a>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main id="catalog" class="flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full flex flex-col md:flex-row gap-8">
+  <aside id="filtersPanel" role="dialog" aria-modal="true" aria-labelledby="filtersTitle" inert class="filters-panel fixed top-0 left-0 h-full w-80 max-w-[85vw] bg-white z-[70] overflow-y-auto p-5 -translate-x-full shadow-2xl md:static md:translate-x-0 md:h-auto md:w-64 md:p-0 md:shadow-none md:z-auto md:overflow-visible md:bg-transparent md:flex-shrink-0 md:space-y-6">
+    <div class="md:hidden flex justify-between items-center mb-5">
+      <h2 id="filtersTitle" class="text-xl font-black" data-i18n="filters.title">Фільтри</h2>
+      <button type="button" id="closeFiltersBtn" aria-label="Закрити" class="p-2 text-gray-600 rounded">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <div>
+      <label for="searchInput" class="sr-only">Пошук</label>
+      <input id="searchInput" type="search" autocomplete="off" placeholder="Пошук товарів…" data-i18n-placeholder="filters.searchPlaceholder" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm">
+    </div>
+    <div class="mt-6 md:mt-0">
+      <h3 class="text-lg font-bold mb-4 border-b pb-2" data-i18n="filters.category">Категорія</h3>
+      <div class="space-y-2" id="filter-category">
+        <label class="flex items-center cursor-pointer"><input type="checkbox" value="men" class="mr-2"><span data-i18n="categories.men">Чоловіча</span></label>
+        <label class="flex items-center cursor-pointer"><input type="checkbox" value="women" class="mr-2"><span data-i18n="categories.women">Жіноча</span></label>
+        <label class="flex items-center cursor-pointer"><input type="checkbox" value="boys" class="mr-2"><span data-i18n="categories.boys">Хлопчики</span></label>
+        <label class="flex items-center cursor-pointer"><input type="checkbox" value="girls" class="mr-2"><span data-i18n="categories.girls">Дівчатка</span></label>
+      </div>
+    </div>
+    <div class="mt-6 md:mt-0">
+      <h3 class="text-lg font-bold mb-4 border-b pb-2" data-i18n="filters.type">Тип взуття</h3>
+      <div class="space-y-2" id="filter-type">
+        <label class="flex items-center cursor-pointer"><input type="checkbox" value="sneakers" class="mr-2"><span data-i18n="types.sneakers">Кросівки</span></label>
+        <label class="flex items-center cursor-pointer"><input type="checkbox" value="boots" class="mr-2"><span data-i18n="types.boots">Чоботи</span></label>
+        <label class="flex items-center cursor-pointer"><input type="checkbox" value="sandals" class="mr-2"><span data-i18n="types.sandals">Босоніжки</span></label>
+        <label class="flex items-center cursor-pointer"><input type="checkbox" value="sport" class="mr-2"><span data-i18n="types.sport">Спортивне</span></label>
+      </div>
+    </div>
+    <div class="mt-6 md:mt-0">
+      <h3 class="text-lg font-bold mb-4 border-b pb-2" data-i18n="filters.season">Сезон</h3>
+      <div class="space-y-2" id="filter-season">
+        <label class="flex items-center cursor-pointer"><input type="checkbox" value="summer" class="mr-2"><span data-i18n="seasons.summer">Літо</span></label>
+        <label class="flex items-center cursor-pointer"><input type="checkbox" value="winter" class="mr-2"><span data-i18n="seasons.winter">Зима</span></label>
+        <label class="flex items-center cursor-pointer"><input type="checkbox" value="spring" class="mr-2"><span data-i18n="seasons.spring">Весна</span></label>
+        <label class="flex items-center cursor-pointer"><input type="checkbox" value="autumn" class="mr-2"><span data-i18n="seasons.autumn">Осінь</span></label>
+      </div>
+    </div>
+    <div class="mt-6 md:mt-0">
+      <h3 class="text-lg font-bold mb-4 border-b pb-2" data-i18n="filters.price">Ціна</h3>
+      <input id="maxPrice" type="range" min="0" max="15000" step="500" value="15000" class="w-full">
+      <div class="flex justify-between text-xs text-gray-500 mt-1"><span>0 ₴</span><span id="maxPriceLabel" class="font-bold">15 000 ₴</span></div>
+    </div>
+    <button id="resetFilters" type="button" class="mt-6 w-full bg-gray-200 hover:bg-gray-300 font-semibold py-2 px-4 rounded" data-i18n="filters.reset">Скинути фільтри</button>
+  </aside>
+
+  <section class="flex-grow min-w-0" id="catalog-products">
+    <div class="flex flex-wrap justify-between items-center gap-3 mb-4">
+      <h2 class="text-2xl font-black uppercase" data-i18n="products.title">Каталог товарів</h2>
+      <div class="flex items-center gap-2">
+        <button id="openFiltersBtn" type="button" class="md:hidden bg-white border border-gray-300 text-sm font-semibold py-2 px-3 rounded-lg" aria-controls="filtersPanel" aria-expanded="false">
+          <span data-i18n="filters.title">Фільтри</span>
+        </button>
+        <select id="sortSelect" class="bg-white border border-gray-300 rounded-lg text-sm py-2 px-3">
+          <option value="popular" data-i18n="sort.popular">Популярні</option>
+          <option value="price-asc" data-i18n="sort.priceAsc">Ціна ↑</option>
+          <option value="price-desc" data-i18n="sort.priceDesc">Ціна ↓</option>
+        </select>
+      </div>
+    </div>
+    <div class="flex flex-wrap items-center gap-2 mb-4">
+      <span id="productsCount" class="text-gray-500 text-sm" role="status"></span>
+      <div id="activeFilters" class="flex flex-wrap gap-2"></div>
+    </div>
+    <div id="productsGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6" aria-busy="false"></div>
+    <div id="noProductsMsg" class="hidden text-center py-12">
+      <p class="text-xl text-gray-500" data-i18n="products.notFound">Нічого не знайдено.</p>
+    </div>
+  </section>
+</main>
+
+<footer class="bg-gray-950 text-white pt-14 pb-8 mt-auto">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+    <span class="font-black text-2xl">STEP<span class="text-orange-500">FORWARD</span></span>
+    <p class="text-gray-500 text-xs mt-4" data-i18n="footer.copyright">© 2026 Step Forward. Усі права захищені.</p>
+  </div>
+</footer>
+
+<div id="cartOverlay" class="fixed inset-0 bg-black/50 z-[60] hidden opacity-0 transition-opacity duration-300"></div>
+<div id="cartDrawer" role="dialog" aria-modal="true" aria-labelledby="cartTitle" inert class="fixed top-0 right-0 w-full sm:w-96 h-full bg-white shadow-2xl z-[70] transform translate-x-full transition-transform duration-300 flex flex-col">
+  <div class="p-4 border-b flex justify-between items-center bg-gray-50">
+    <h2 id="cartTitle" class="text-xl font-bold" data-i18n="cart.title">Ваш кошик</h2>
+    <button id="closeCartBtn" type="button" aria-label="Закрити" class="p-2 text-gray-500 rounded">
+      <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+    </button>
+  </div>
+  <div id="cartItemsContainer" class="flex-grow p-4 overflow-y-auto space-y-4"></div>
+  <div class="p-4 border-t bg-gray-50">
+    <div class="flex justify-between items-center mb-3">
+      <span class="font-semibold text-gray-600" data-i18n="cart.total">Разом:</span>
+      <span id="cartTotal" class="text-xl font-bold">0 ₴</span>
+    </div>
+    <button id="clearCartBtn" type="button" class="w-full mb-2 text-xs font-semibold text-gray-500" data-i18n="cart.clear">Очистити кошик</button>
+    <button id="checkoutBtn" type="button" class="w-full bg-orange-700 hover:bg-orange-600 disabled:bg-gray-300 text-white font-bold py-3 rounded" data-i18n="cart.checkout">Оформити</button>
+  </div>
+</div>
+
+<div id="toast" role="status" aria-live="polite" class="fixed bottom-5 right-5 bg-gray-900 text-white px-4 py-3 rounded shadow-lg transform translate-y-20 opacity-0 transition-all duration-300 z-[80] flex items-center gap-3 max-w-[calc(100vw-2rem)]">
+  <span id="toastMsg" class="text-sm"></span>
+  <button id="toastAction" type="button" class="text-orange-400 text-sm font-bold hidden"></button>
+</div>
+
+<div id="productModal" role="dialog" aria-modal="true" aria-hidden="true" inert class="fixed inset-0 z-[100] hidden items-center justify-center p-4">
+  <div class="absolute inset-0 modal-backdrop" data-close-product></div>
+  <div class="relative bg-white rounded-2xl w-full max-w-4xl max-h-[92vh] overflow-y-auto shadow-2xl">
+    <button type="button" data-close-product class="absolute top-3 right-3 z-10 icon-btn" aria-label="Закрити">×</button>
+    <div class="grid md:grid-cols-2">
+      <div class="aspect-square bg-gray-100"><img id="productModalImage" src="" alt="" class="w-full h-full object-cover"></div>
+      <div class="p-6 sm:p-8 flex flex-col">
+        <p id="productModalMeta" class="text-xs uppercase tracking-widest text-orange-600 font-bold"></p>
+        <h2 id="productModalTitle" class="text-3xl font-black mt-2"></h2>
+        <div id="productModalRating" class="mt-3 text-sm"></div>
+        <p id="productModalPrice" class="text-2xl font-black mt-5"></p>
+        <p id="productModalDescription" class="text-gray-500 mt-4"></p>
+        <div class="mt-6">
+          <label for="productModalSize" class="block text-sm font-bold mb-2" data-i18n="products.size">Розмір</label>
+          <select id="productModalSize" class="w-full px-3 py-3 border rounded-lg"></select>
+        </div>
+        <button id="productModalAdd" type="button" class="mt-4 w-full bg-zinc-950 hover:bg-orange-600 text-white font-bold py-3.5 rounded-lg" data-i18n="products.addToCart">В кошик</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="checkoutModal" role="dialog" aria-modal="true" aria-hidden="true" inert class="fixed inset-0 z-[100] hidden items-center justify-center p-4">
+  <div class="absolute inset-0 modal-backdrop" data-close-checkout></div>
+  <div class="relative bg-white rounded-2xl w-full max-w-lg max-h-[94vh] overflow-y-auto shadow-2xl p-6">
+    <button type="button" data-close-checkout class="absolute top-3 right-3 text-2xl text-gray-500" aria-label="Закрити">×</button>
+    <h2 class="text-2xl font-black mb-4" data-i18n="checkout.title">Оформлення замовлення</h2>
+    <form id="checkoutForm" class="space-y-4" novalidate>
+      <div>
+        <label for="checkoutName" class="block text-sm font-bold mb-1" data-i18n="checkout.name">Ім'я та прізвище</label>
+        <input id="checkoutName" required autocomplete="name" class="checkout-input" data-i18n-placeholder="checkout.namePlaceholder">
+        <p id="checkoutNameError" class="text-red-600 text-xs hidden" data-i18n="checkout.nameError">Введіть ім'я та прізвище.</p>
+      </div>
+      <div>
+        <label for="checkoutPhone" class="block text-sm font-bold mb-1" data-i18n="checkout.phone">Телефон</label>
+        <input id="checkoutPhone" required type="tel" class="checkout-input" placeholder="+38 (0__) ___-__-__">
+        <p id="checkoutPhoneError" class="text-red-600 text-xs hidden" data-i18n="checkout.phoneError">Некоректний номер.</p>
+      </div>
+      <div>
+        <label for="checkoutEmail" class="block text-sm font-bold mb-1" data-i18n="checkout.email">Email</label>
+        <input id="checkoutEmail" required type="email" class="checkout-input" placeholder="name@example.com">
+        <p id="checkoutEmailError" class="text-red-600 text-xs hidden" data-i18n="checkout.emailError">Некоректний email.</p>
+      </div>
+      <div>
+        <label for="checkoutPromo" class="block text-sm font-bold mb-1" data-i18n="checkout.promo">Промокод</label>
+        <div class="flex gap-2">
+          <input id="checkoutPromo" type="text" maxlength="20" class="checkout-input flex-1" placeholder="STEP10">
+          <button id="applyPromoBtn" type="button" class="px-4 rounded-xl bg-zinc-900 text-white font-bold text-sm" data-i18n="checkout.promoApply">OK</button>
+        </div>
+        <p id="checkoutPromoMsg" class="text-xs mt-1"></p>
+      </div>
+      <div class="bg-gray-50 p-4 rounded-xl">
+        <div class="flex justify-between text-sm"><span data-i18n="checkout.subtotal">Сума:</span><span id="checkoutSubtotal">0 ₴</span></div>
+        <div id="checkoutDiscountRow" class="hidden justify-between text-sm text-green-700 font-semibold mt-1"><span data-i18n="checkout.discount">Знижка:</span><span id="checkoutDiscount">−0 ₴</span></div>
+        <div class="flex justify-between items-center font-black text-lg pt-2 mt-2 border-t"><span data-i18n="cart.total">Разом:</span><span id="checkoutTotal">0 ₴</span></div>
+      </div>
+      <button type="submit" class="w-full bg-orange-600 hover:bg-orange-500 text-white font-bold py-4 rounded-xl" data-i18n="checkout.submit">Підтвердити</button>
+    </form>
+  </div>
+</div>
+
+<nav class="bottom-nav fixed bottom-0 inset-x-0 z-[55] bg-white border-t md:hidden grid grid-cols-4">
+  <a href="#catalog" class="py-3 text-center text-[11px] font-semibold text-gray-600" data-i18n="bottom.home">Головна</a>
+  <a href="#collections" class="py-3 text-center text-[11px] font-semibold text-gray-600" data-i18n="bottom.catalog">Каталог</a>
+  <button type="button" id="bottomSearchBtn" class="py-3 text-center text-[11px] font-semibold text-gray-600" data-i18n="bottom.search">Пошук</button>
+  <button type="button" id="bottomCartBtn" class="py-3 text-center text-[11px] font-semibold text-gray-600" data-i18n="bottom.cart">Кошик</button>
+</nav>
+
+<script type="module">
+import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+
+const SB_URL = 'https://wxsivaeddadjotewtvh.supabase.co';
+const SB_KEY = 'sb_publishable_WTvrym-NaOP1BEEK0XaM1A_5pzM9Dmc';
+const sb = createClient(SB_URL, SB_KEY);
+
+const MAX_PRICE = 15000;
+const $ = (id) => document.getElementById(id);
+const escapeHtml = (v) => String(v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+
+function unsplashSrcSet(base, widths = [400, 700, 1200]) {
+  if (!base || typeof base !== 'string' || !base.startsWith('http')) return '';
+  try {
+    const u = new URL(base);
+    return widths.map(w => { u.searchParams.set('w', String(w)); return `${u.toString()} ${w}w`; }).join(', ');
+  } catch { return ''; }
+}
+
+/* I18N */
+const i18n = {
+  uk: {
+    locale:'uk-UA', currency:'₴',
+    'meta.title':'Step Forward — Інтернет-магазин взуття',
+    'nav.new':'Новинки','nav.men':'Чоловікам','nav.women':'Жінкам','nav.kids':'Дітям',
+    'banner.eyebrow':'PREMIUM FOOTWEAR · CITY & OUTDOOR',
+    'banner.titleL1':'Твій шлях.','banner.titleL2':'Твоя стихія.',
+    'banner.subtitle':'Взуття для міста та активного відпочинку',
+    'banner.shopMen':'Для чоловіків','banner.shopWomen':'Для жінок','banner.shopKids':'Для дітей',
+    'filters.title':'Фільтри','filters.category':'Категорія','filters.type':'Тип взуття',
+    'filters.season':'Сезон','filters.price':'Ціна','filters.searchPlaceholder':'Пошук товарів…',
+    'filters.reset':'Скинути фільтри',
+    'sort.popular':'Популярні','sort.priceAsc':'Ціна ↑','sort.priceDesc':'Ціна ↓',
+    'categories.men':'Чоловіча','categories.women':'Жіноча','categories.boys':'Хлопчики','categories.girls':'Дівчатка',
+    'types.sneakers':'Кросівки','types.boots':'Чоботи','types.sandals':'Босоніжки','types.sport':'Спортивне',
+    'seasons.summer':'Літо','seasons.winter':'Зима','seasons.spring':'Весна','seasons.autumn':'Осінь',
+    'products.title':'Каталог товарів','products.notFound':'Нічого не знайдено.',
+    'products.addToCart':'У кошик','products.selectSize':'Оберіть розмір','products.size':'Розмір',
+    'cart.title':'Ваш кошик','cart.empty':'Кошик порожній','cart.total':'Разом:',
+    'cart.checkout':'Оформити','cart.size':'Розмір','cart.clear':'Очистити',
+    'toast.added':'Додано','toast.removed':'Видалено','toast.undo':'Скасувати',
+    'checkout.title':'Оформлення замовлення','checkout.name':"Ім'я та прізвище",'checkout.phone':'Телефон','checkout.email':'Email',
+    'checkout.submit':'Підтвердити','checkout.success':'Дякуємо! Замовлення прийнято.',
+    'checkout.namePlaceholder':'Наприклад, Данило Марусов','checkout.nameError':"Введіть ім'я та прізвище",
+    'checkout.phoneError':'Введіть номер','checkout.emailError':'Перевірте email',
+    'checkout.promo':'Промокод','checkout.promoApply':'OK','checkout.promoApplied':'Промокод застосовано',
+    'checkout.promoError':'Невірний промокод','checkout.promoEmpty':'Введіть промокод',
+    'checkout.subtotal':'Сума:','checkout.discount':'Знижка:',
+    'bottom.home':'Головна','bottom.catalog':'Каталог','bottom.search':'Пошук','bottom.cart':'Кошик',
+    'product.description':'Універсальна модель для міста та активного відпочинку.',
+    'product.addedFavorite':'Додано','product.removedFavorite':'Видалено',
+    'ui.skip':'Перейти до вмісту','ui.openCart':'Кошик',
+    'footer.copyright':'© 2026 Step Forward. Усі права захищені.',
+    'plural.products.shown':{one:'Показано {n} товар',few:'Показано {n} товари',many:'Показано {n} товарів',other:'Показано {n} товарів'},
+    'plural.reviews':{one:'{n} відгук',few:'{n} відгуки',many:'{n} відгуків',other:'{n} відгуків'}
+  },
+  ru: {
+    locale:'ru-UA', currency:'₴',
+    'meta.title':'Step Forward — Интернет-магазин обуви',
+    'nav.new':'Новинки','nav.men':'Мужчинам','nav.women':'Женщинам','nav.kids':'Детям',
+    'banner.eyebrow':'PREMIUM FOOTWEAR · CITY & OUTDOOR',
+    'banner.titleL1':'Твой путь.','banner.titleL2':'Твоя стихия.',
+    'banner.subtitle':'Обувь для города и активного отдыха',
+    'banner.shopMen':'Для мужчин','banner.shopWomen':'Для женщин','banner.shopKids':'Для детей',
+    'filters.title':'Фильтры','filters.category':'Категория','filters.type':'Тип обуви',
+    'filters.season':'Сезон','filters.price':'Цена','filters.searchPlaceholder':'Поиск товаров…',
+    'filters.reset':'Сбросить фильтры',
+    'sort.popular':'Популярные','sort.priceAsc':'Цена ↑','sort.priceDesc':'Цена ↓',
+    'categories.men':'Мужская','categories.women':'Женская','categories.boys':'Мальчики','categories.girls':'Девочки',
+    'types.sneakers':'Кроссовки','types.boots':'Сапоги','types.sandals':'Босоножки','types.sport':'Спортивная',
+    'seasons.summer':'Лето','seasons.winter':'Зима','seasons.spring':'Весна','seasons.autumn':'Осень',
+    'products.title':'Каталог товаров','products.notFound':'Ничего не найдено.',
+    'products.addToCart':'В корзину','products.selectSize':'Выберите размер','products.size':'Размер',
+    'cart.title':'Ваша корзина','cart.empty':'Корзина пуста','cart.total':'Итого:',
+    'cart.checkout':'Оформить','cart.size':'Размер','cart.clear':'Очистить',
+    'toast.added':'Добавлено','toast.removed':'Удалено','toast.undo':'Отменить',
+    'checkout.title':'Оформление','checkout.name':'Имя и фамилия','checkout.phone':'Телефон','checkout.email':'Email',
+    'checkout.submit':'Подтвердить','checkout.success':'Спасибо! Заказ принят.',
+    'checkout.namePlaceholder':'Например, Данило Марусов','checkout.nameError':'Введите имя',
+    'checkout.phoneError':'Введите номер','checkout.emailError':'Проверьте email',
+    'checkout.promo':'Промокод','checkout.promoApply':'OK','checkout.promoApplied':'Промокод применён',
+    'checkout.promoError':'Неверный промокод','checkout.promoEmpty':'Введите промокод',
+    'checkout.subtotal':'Сумма:','checkout.discount':'Скидка:',
+    'bottom.home':'Главная','bottom.catalog':'Каталог','bottom.search':'Поиск','bottom.cart':'Корзина',
+    'product.description':'Универсальная модель для города и активного отдыха.',
+    'product.addedFavorite':'Добавлено','product.removedFavorite':'Удалено',
+    'ui.skip':'К содержимому','ui.openCart':'Корзина',
+    'footer.copyright':'© 2026 Step Forward. Все права защищены.',
+    'plural.products.shown':{one:'Показан {n} товар',few:'Показано {n} товара',many:'Показано {n} товаров',other:'Показано {n} товаров'},
+    'plural.reviews':{one:'{n} отзыв',few:'{n} отзыва',many:'{n} отзывов',other:'{n} отзывов'}
+  },
+  en: {
+    locale:'en-US', currency:'$',
+    'meta.title':'Step Forward — Online shoe store',
+    'nav.new':'New','nav.men':'Men','nav.women':'Women','nav.kids':'Kids',
+    'banner.eyebrow':'PREMIUM FOOTWEAR · CITY & OUTDOOR',
+    'banner.titleL1':'Your path.','banner.titleL2':'Your element.',
+    'banner.subtitle':'Footwear for the city and the outdoors',
+    'banner.shopMen':'Shop men','banner.shopWomen':'Shop women','banner.shopKids':'Shop kids',
+    'filters.title':'Filters','filters.category':'Category','filters.type':'Shoe type',
+    'filters.season':'Season','filters.price':'Price','filters.searchPlaceholder':'Search products…',
+    'filters.reset':'Reset filters',
+    'sort.popular':'Popular','sort.priceAsc':'Price ↑','sort.priceDesc':'Price ↓',
+    'categories.men':"Men's",'categories.women':"Women's",'categories.boys':'Boys','categories.girls':'Girls',
+    'types.sneakers':'Sneakers','types.boots':'Boots','types.sandals':'Sandals','types.sport':'Sport',
+    'seasons.summer':'Summer','seasons.winter':'Winter','seasons.spring':'Spring','seasons.autumn':'Autumn',
+    'products.title':'Product catalog','products.notFound':'Nothing found.',
+    'products.addToCart':'Add to cart','products.selectSize':'Select size','products.size':'Size',
+    'cart.title':'Your cart','cart.empty':'Cart is empty','cart.total':'Total:',
+    'cart.checkout':'Checkout','cart.size':'Size','cart.clear':'Clear',
+    'toast.added':'Added','toast.removed':'Removed','toast.undo':'Undo',
+    'checkout.title':'Checkout','checkout.name':'Full name','checkout.phone':'Phone','checkout.email':'Email',
+    'checkout.submit':'Confirm','checkout.success':'Thank you! Order received.',
+    'checkout.namePlaceholder':'For example, Danilo Marusov','checkout.nameError':'Enter your name',
+    'checkout.phoneError':'Enter phone','checkout.emailError':'Check email',
+    'checkout.promo':'Promo code','checkout.promoApply':'OK','checkout.promoApplied':'Promo applied',
+    'checkout.promoError':'Invalid promo','checkout.promoEmpty':'Enter code',
+    'checkout.subtotal':'Subtotal:','checkout.discount':'Discount:',
+    'bottom.home':'Home','bottom.catalog':'Catalog','bottom.search':'Search','bottom.cart':'Cart',
+    'product.description':'A versatile model for the city and outdoors.',
+    'product.addedFavorite':'Added','product.removedFavorite':'Removed',
+    'ui.skip':'Skip','ui.openCart':'Cart',
+    'footer.copyright':'© 2026 Step Forward. All rights reserved.',
+    'plural.products.shown':{one:'Showing {n} product',other:'Showing {n} products'},
+    'plural.reviews':{one:'{n} review',other:'{n} reviews'}
+  }
+};
+
+let currentLang = localStorage.getItem('lang') || 'uk';
+if (!i18n[currentLang]) currentLang = 'uk';
+
+const t = (key, vars) => {
+  const pack = i18n[currentLang] || i18n.uk;
+  let s = pack[key] ?? i18n.uk[key] ?? key;
+  if (vars && typeof s === 'string') for (const k in vars) s = s.replaceAll(`{${k}}`, vars[k]);
+  return s;
+};
+const tp = (key, n) => {
+  const pack = i18n[currentLang] || i18n.uk;
+  const forms = pack[key] || i18n.uk[key];
+  if (!forms || typeof forms !== 'object') return t(key, {n});
+  const cat = new Intl.PluralRules(pack.locale).select(n);
+  return (forms[cat] || forms.other || forms.one || '').replaceAll('{n}', n);
+};
+const formatPrice = (v) => {
+  const pack = i18n[currentLang] || i18n.uk;
+  return new Intl.NumberFormat(pack.locale, {maximumFractionDigits:0}).format(v) + ' ' + pack.currency;
+};
+
+/* STATE */
+let products = [];
+let cart = JSON.parse(localStorage.getItem('cart') || '[]');
+let favorites = JSON.parse(localStorage.getItem('favorites') || '[]');
+let recentlyViewed = JSON.parse(localStorage.getItem('recently_viewed') || '[]');
+let filters = { search:'', categories:[], types:[], seasons:[], maxPrice:MAX_PRICE, sort:'popular' };
+let selectedProductId = null;
+let activePromo = null;
+
+const saveCart = () => localStorage.setItem('cart', JSON.stringify(cart));
+const saveFavorites = () => localStorage.setItem('favorites', JSON.stringify(favorites));
+const saveRecentlyViewed = () => localStorage.setItem('recently_viewed', JSON.stringify(recentlyViewed));
+
+function productName(p) {
+  return (p.names && (p.names[currentLang] || p.names.uk || p.names.en)) || p.slug || '';
+}
+
+function mapProduct(r) {
+  const names = {}, descriptions = {};
+  (r.product_translations || []).forEach(tr => { names[tr.lang] = tr.name; descriptions[tr.lang] = tr.description; });
+  const imgs = [...(r.product_images || [])].sort((a,b) => (a.position||0) - (b.position||0));
+  const sizes = [...(r.product_sizes || [])].filter(s => (s.stock||0) > 0).map(s => s.size_value).sort((a,b) => a-b);
+  return {
+    id: r.id, slug: r.slug, category: r.category, type: r.type, season: r.season,
+    price: r.price_kopecks / 100,
+    oldPrice: r.old_price_kopecks ? r.old_price_kopecks / 100 : null,
+    rating: Number(r.rating) || 0,
+    reviews: r.reviews_count || 0,
+    isNew: r.is_new,
+    tags: r.tags || [],
+    img: imgs[0] ? imgs[0].url : '',
+    img2: imgs[1] ? imgs[1].url : '',
+    sizes: sizes.length ? sizes : [40,41,42,43,44],
+    names, descriptions
+  };
+}
+
+async function loadProducts() {
+  const { data, error } = await sb
+    .from('products')
+    .select('id, sku, slug, category, type, season, price_kopecks, old_price_kopecks, rating, reviews_count, is_new, tags, product_translations(lang, name, description), product_images(url, position), product_sizes(size_value, stock)')
+    .eq('is_published', true)
+    .order('created_at', { ascending: false });
+  if (error) throw error;
+  return (data || []).map(mapProduct);
+}
+
+/* I18N APPLY */
+function applyI18n() {
+  document.documentElement.lang = currentLang;
+  document.title = t('meta.title');
+  document.querySelectorAll('[data-i18n]').forEach(el => { el.textContent = t(el.dataset.i18n); });
+  document.querySelectorAll('[data-i18n-placeholder]').forEach(el => { el.placeholder = t(el.dataset.i18nPlaceholder); });
+  document.querySelectorAll('[data-i18n-aria]').forEach(el => { el.setAttribute('aria-label', t(el.dataset.i18nAria)); });
+  document.querySelectorAll('.lang-btn').forEach(btn => {
+    const active = btn.dataset.lang === currentLang;
+    btn.setAttribute('aria-pressed', active ? 'true' : 'false');
+    btn.classList.toggle('bg-orange-600', active);
+    btn.classList.toggle('text-white', active);
+    btn.classList.toggle('text-gray-700', !active);
+  });
+  const mp = $('maxPrice');
+  if (mp) $('maxPriceLabel').textContent = formatPrice(Number(mp.value));
+  renderProducts();
+  renderCart();
+}
+
+/* FILTERS */
+function getChecked(id) {
+  return Array.from(document.querySelectorAll(`#${id} input[type="checkbox"]:checked`)).map(cb => cb.value);
+}
+function syncFilters() {
+  filters.categories = getChecked('filter-category');
+  filters.types = getChecked('filter-type');
+  filters.seasons = getChecked('filter-season');
+}
+function getFilteredProducts() {
+  const q = filters.search.trim().toLowerCase();
+  let list = products.filter(p => {
+    const mCat = !filters.categories.length || filters.categories.includes(p.category);
+    const mType = !filters.types.length || filters.types.includes(p.type);
+    const mSeason = !filters.seasons.length || filters.seasons.includes(p.season);
+    const mPrice = p.price <= filters.maxPrice;
+    const mSearch = !q || productName(p).toLowerCase().includes(q);
+    return mCat && mType && mSeason && mPrice && mSearch;
+  });
+  if (filters.sort === 'price-asc') list.sort((a,b) => a.price - b.price);
+  else if (filters.sort === 'price-desc') list.sort((a,b) => b.price - a.price);
+  return list;
+}
+
+/* RENDER */
+function productCardHtml(p) {
+  const fav = favorites.includes(p.id);
+  const name = escapeHtml(productName(p));
+  const srcset = unsplashSrcSet(p.img, [400, 700, 1200]);
+  const srcsetAlt = p.img2 ? unsplashSrcSet(p.img2, [400, 700]) : '';
+  return `
+    <article class="product-card bg-white rounded-2xl shadow-sm hover:shadow-xl transition overflow-hidden border border-gray-100 flex flex-col">
+      <div class="product-media relative aspect-square overflow-hidden bg-gray-100">
+        <button type="button" data-product-view="${p.id}" aria-label="${name}" class="absolute inset-0 w-full h-full cursor-pointer">
+          ${p.img ? `<img src="${escapeHtml(p.img)}" srcset="${escapeHtml(srcset)}" sizes="(min-width:1024px) 33vw, (min-width:640px) 50vw, 100vw" alt="${name}" loading="lazy" class="w-full h-full object-cover">` : '<div class="w-full h-full skeleton"></div>'}
+          ${p.img2 ? `<img src="${escapeHtml(p.img2)}" srcset="${escapeHtml(srcsetAlt)}" sizes="(min-width:1024px) 33vw, 50vw" alt="" loading="lazy" class="img-alt absolute inset-0 w-full h-full object-cover">` : ''}
+        </button>
+        <div class="absolute top-3 left-3 flex flex-wrap gap-1 pointer-events-none">
+          ${p.isNew ? `<span class="bg-orange-600 text-white text-[10px] font-black px-2 py-1 rounded-full">NEW</span>` : ''}
+          ${p.oldPrice ? `<span class="bg-white/95 text-red-600 text-[10px] font-black px-2 py-1 rounded-full">-${Math.round((1-p.price/p.oldPrice)*100)}%</span>` : ''}
+        </div>
+        <button type="button" data-favorite="${p.id}" class="icon-btn absolute top-3 right-3" aria-pressed="${fav}">
+          <span class="text-lg ${fav ? 'text-orange-600' : 'text-gray-700'}">${fav ? '♥' : '♡'}</span>
+        </button>
+      </div>
+      <div class="p-4 flex flex-col flex-grow">
+        <div class="text-[11px] uppercase tracking-wider text-gray-500 mb-1">${escapeHtml(t('types.'+p.type))}</div>
+        <h3 class="text-base font-bold mb-2">
+          <button type="button" data-product-view="${p.id}" class="text-left hover:text-orange-700">${name}</button>
+        </h3>
+        <div class="text-xs text-gray-500 mb-3">★ ${p.rating} · ${escapeHtml(tp('plural.reviews', p.reviews))}</div>
+        <div class="mt-auto">
+          <select data-size-select="${p.id}" class="w-full mb-3 px-3 py-2.5 border rounded-lg text-sm bg-white">
+            <option value="">${escapeHtml(t('products.selectSize'))}</option>
+            ${p.sizes.map(s => `<option value="${s}">${escapeHtml(t('products.size'))} ${s}</option>`).join('')}
+          </select>
+          <div class="flex justify-between items-end gap-2">
+            <div>
+              <span class="text-lg font-black">${formatPrice(p.price)}</span>
+              ${p.oldPrice ? `<span class="block text-xs text-gray-400 line-through">${formatPrice(p.oldPrice)}</span>` : ''}
+            </div>
+            <button type="button" data-add-to-cart="${p.id}" class="bg-zinc-950 hover:bg-orange-700 text-white text-sm font-semibold px-3 py-2.5 rounded-lg">
+              + ${escapeHtml(t('products.addToCart'))}
+            </button>
+          </div>
+        </div>
+      </div>
+    </article>`;
+}
+
+function renderSkeleton(count = 6) {
+  const grid = $('productsGrid');
+  grid.setAttribute('aria-busy', 'true');
+  grid.innerHTML = Array.from({length: count}, () => `
+    <article class="bg-white rounded-2xl border border-gray-100 overflow-hidden shadow-sm">
+      <div class="aspect-square skeleton"></div>
+      <div class="p-4 space-y-3">
+        <div class="h-3 w-1/3 skeleton rounded"></div>
+        <div class="h-4 w-3/4 skeleton rounded"></div>
+        <div class="h-10 skeleton rounded"></div>
+      </div>
+    </article>`).join('');
+}
+
+function renderProducts() {
+  const grid = $('productsGrid');
+  const list = getFilteredProducts();
+  grid.innerHTML = '';
+  $('productsCount').textContent = tp('plural.products.shown', list.length);
+  grid.setAttribute('aria-busy', 'false');
+  if (!list.length) { $('noProductsMsg').classList.remove('hidden'); return; }
+  $('noProductsMsg').classList.add('hidden');
+  grid.innerHTML = list.map(productCardHtml).join('');
+  renderActiveFilters();
+}
+
+function renderActiveFilters() {
+  const box = $('activeFilters');
+  box.innerHTML = '';
+  const chips = [];
+  filters.categories.forEach(v => chips.push({label: t('categories.'+v), fn: () => toggleFilter('filter-category', v)}));
+  filters.types.forEach(v => chips.push({label: t('types.'+v), fn: () => toggleFilter('filter-type', v)}));
+  filters.seasons.forEach(v => chips.push({label: t('seasons.'+v), fn: () => toggleFilter('filter-season', v)}));
+  if (filters.search) chips.push({label: '“'+filters.search+'”', fn: () => { $('searchInput').value=''; filters.search=''; renderProducts(); }});
+  chips.forEach(c => {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'inline-flex items-center gap-1 bg-orange-100 text-orange-800 text-xs font-medium px-3 py-1 rounded-full';
+    b.innerHTML = `${escapeHtml(c.label)} <span class="font-bold">×</span>`;
+    b.addEventListener('click', c.fn);
+    box.appendChild(b);
+  });
+}
+
+function toggleFilter(containerId, value) {
+  const cb = document.querySelector(`#${containerId} input[value="${value}"]`);
+  if (cb) cb.checked = false;
+  syncFilters();
+  renderProducts();
+}
+
+/* CART */
+function cartKey(id, size) { return id + '::' + size; }
+
+function addToCart(productId, size) {
+  const product = products.find(p => String(p.id) === String(productId));
+  if (!product) return;
+  if (!size) { showToast(t('products.selectSize')); return; }
+  const ex = cart.find(i => cartKey(i.productId, i.size) === cartKey(productId, size));
+  if (ex) ex.quantity = Math.min(ex.quantity + 1, 99);
+  else cart.push({productId: String(productId), size, quantity: 1});
+  saveCart();
+  renderCart();
+  showToast(t('toast.added'));
+}
+
+function changeQty(productId, size, delta) {
+  const i = cart.findIndex(x => cartKey(x.productId, x.size) === cartKey(productId, size));
+  if (i === -1) return;
+  cart[i].quantity += delta;
+  if (cart[i].quantity <= 0) cart.splice(i, 1);
+  saveCart();
+  renderCart();
+}
+
+function removeFromCart(productId, size) {
+  const removed = cart.find(i => cartKey(i.productId, i.size) === cartKey(productId, size));
+  if (!removed) return;
+  cart = cart.filter(i => cartKey(i.productId, i.size) !== cartKey(productId, size));
+  saveCart();
+  renderCart();
+  showToast(t('toast.removed'), {
+    actionLabel: t('toast.undo'),
+    actionTtl: 5000,
+    onAction: () => { cart.push(removed); saveCart(); renderCart(); showToast(t('toast.added')); }
+  });
+}
+
+function renderCart() {
+  const items = cart.reduce((s,i) => s + i.quantity, 0);
+  const badge = $('cartBadge');
+  if (items > 0) { badge.textContent = items; badge.classList.remove('hidden'); }
+  else badge.classList.add('hidden');
+  const box = $('cartItemsContainer');
+  box.innerHTML = '';
+  if (!cart.length) {
+    box.innerHTML = `<div class="text-center text-gray-500 mt-10">${t('cart.empty')}</div>`;
+    $('cartTotal').textContent = formatPrice(0);
+    $('checkoutBtn').disabled = true;
+    return;
+  }
+  $('checkoutBtn').disabled = false;
+  let sum = 0;
+  cart.forEach(item => {
+    const p = products.find(x => String(x.id) === String(item.productId));
+    if (!p) return;
+    sum += p.price * item.quantity;
+    const div = document.createElement('div');
+    div.className = 'flex gap-3 items-center bg-white p-3 rounded-lg border';
+    div.innerHTML = `
+      ${p.img ? `<img src="${escapeHtml(p.img)}" class="w-16 h-16 object-cover rounded">` : ''}
+      <div class="flex-grow min-w-0">
+        <div class="text-sm font-bold truncate">${escapeHtml(productName(p))}</div>
+        <div class="text-xs text-gray-500">${t('cart.size')}: ${escapeHtml(item.size)}</div>
+        <div class="text-orange-700 font-bold text-sm">${formatPrice(p.price)}</div>
+      </div>
+      <div class="flex flex-col items-end gap-1">
+        <button data-remove="${item.productId}" data-size="${escapeHtml(item.size)}" class="text-red-500 p-1">×</button>
+        <div class="flex items-center gap-1">
+          <button data-qty="${item.productId}" data-size="${escapeHtml(item.size)}" data-delta="-1" class="w-6 h-6 bg-gray-200 rounded">−</button>
+          <span class="text-sm font-bold w-5 text-center">${item.quantity}</span>
+          <button data-qty="${item.productId}" data-size="${escapeHtml(item.size)}" data-delta="1" class="w-6 h-6 bg-gray-200 rounded">+</button>
+        </div>
+      </div>`;
+    box.appendChild(div);
+  });
+  $('cartTotal').textContent = formatPrice(sum);
+}
+
+/* TOAST */
+let toastTimer;
+function showToast(msg, opts = {}) {
+  const tEl = $('toast'), msgEl = $('toastMsg'), action = $('toastAction');
+  msgEl.textContent = msg;
+  action.classList.add('hidden');
+  action.onclick = null;
+  if (opts.actionLabel && opts.onAction) {
+    action.textContent = opts.actionLabel;
+    action.classList.remove('hidden');
+    action.onclick = () => { opts.onAction(); tEl.classList.add('translate-y-20','opacity-0'); };
+  }
+  tEl.classList.remove('translate-y-20','opacity-0');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => tEl.classList.add('translate-y-20','opacity-0'), opts.actionTtl || 2500);
+}
+
+/* DIALOGS */
+function openDialog(d, trigger, before) {
+  if (before) before();
+  d.removeAttribute('inert');
+  d.setAttribute('aria-hidden','false');
+  if (trigger) trigger.setAttribute('aria-expanded','true');
+  document.body.classList.add('overflow-hidden');
+}
+function closeDialog(d, trigger) {
+  d.setAttribute('inert','');
+  d.setAttribute('aria-hidden','true');
+  if (trigger) trigger.setAttribute('aria-expanded','false');
+  document.body.classList.remove('overflow-hidden');
+}
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') {
+    if (!$('cartDrawer').hasAttribute('inert')) closeCart();
+    if (!$('mobileMenu').classList.contains('pointer-events-none')) closeMobileMenu();
+    if (!$('productModal').classList.contains('hidden')) closeProductModal();
+    if (!$('checkoutModal').classList.contains('hidden')) closeCheckout();
+  }
+});
+
+/* CART DRAWER */
+function openCart() {
+  $('cartOverlay').classList.remove('hidden');
+  requestAnimationFrame(() => $('cartOverlay').classList.remove('opacity-0'));
+  openDialog($('cartDrawer'), $('cartBtn'), () => $('cartDrawer').classList.remove('translate-x-full'));
+}
+function closeCart() {
+  $('cartOverlay').classList.add('opacity-0');
+  $('cartDrawer').classList.add('translate-x-full');
+  setTimeout(() => $('cartOverlay').classList.add('hidden'), 300);
+  closeDialog($('cartDrawer'), $('cartBtn'));
+}
+$('cartBtn').addEventListener('click', openCart);
+$('closeCartBtn').addEventListener('click', closeCart);
+$('cartOverlay').addEventListener('click', closeCart);
+$('clearCartBtn').addEventListener('click', () => {
+  if (!cart.length) return;
+  const snap = [...cart];
+  cart = [];
+  saveCart(); renderCart();
+  showToast(t('toast.removed'), {
+    actionLabel: t('toast.undo'), actionTtl: 5000,
+    onAction: () => { cart = snap; saveCart(); renderCart(); showToast(t('toast.added')); }
+  });
+});
+
+/* MOBILE MENU */
+function openMobileMenu() {
+  $('mobileMenu').classList.remove('opacity-0','pointer-events-none');
+  openDialog($('mobileMenu'), $('menuBtn'), () => $('mobileMenuPanel').classList.remove('-translate-x-full'));
+}
+function closeMobileMenu() {
+  $('mobileMenu').classList.add('opacity-0','pointer-events-none');
+  $('mobileMenuPanel').classList.add('-translate-x-full');
+  closeDialog($('mobileMenu'), $('menuBtn'));
+}
+$('menuBtn').addEventListener('click', openMobileMenu);
+document.querySelectorAll('[data-close-menu]').forEach(el => el.addEventListener('click', closeMobileMenu));
+
+/* FILTERS PANEL */
+$('openFiltersBtn').addEventListener('click', () => {
+  $('filtersPanel').classList.remove('-translate-x-full');
+  openDialog($('filtersPanel'), $('openFiltersBtn'));
+});
+$('closeFiltersBtn').addEventListener('click', () => {
+  $('filtersPanel').classList.add('-translate-x-full');
+  closeDialog($('filtersPanel'), $('openFiltersBtn'));
+});
+
+/* PRODUCT MODAL */
+function openProductModal(id) {
+  const p = products.find(x => String(x.id) === String(id));
+  if (!p) return;
+  selectedProductId = id;
+  recentlyViewed = [id, ...recentlyViewed.filter(x => x !== id)].slice(0, 6);
+  saveRecentlyViewed();
+  $('productModalImage').src = p.img || '';
+  $('productModalImage').alt = productName(p);
+  $('productModalTitle').textContent = productName(p);
+  $('productModalMeta').textContent = t('categories.'+p.category) + ' · ' + t('types.'+p.type);
+  $('productModalRating').textContent = '★ ' + p.rating + ' · ' + tp('plural.reviews', p.reviews);
+  $('productModalPrice').textContent = formatPrice(p.price);
+  $('productModalDescription').textContent = (p.descriptions && (p.descriptions[currentLang] || p.descriptions.uk)) || t('product.description');
+  $('productModalSize').innerHTML = `<option value="">${escapeHtml(t('products.selectSize'))}</option>` + p.sizes.map(x => `<option value="${x}">${escapeHtml(t('products.size'))} ${x}</option>`).join('');
+  $('productModal').classList.remove('hidden');
+  $('productModal').classList.add('flex');
+  openDialog($('productModal'), null);
+}
+function closeProductModal() {
+  $('productModal').classList.add('hidden');
+  $('productModal').classList.remove('flex');
+  closeDialog($('productModal'), null);
+}
+document.querySelectorAll('[data-close-product]').forEach(el => el.addEventListener('click', closeProductModal));
+$('productModalAdd').addEventListener('click', () => {
+  const size = $('productModalSize').value;
+  if (!selectedProductId) return;
+  addToCart(selectedProductId, size);
+  if (size) closeProductModal();
+});
+
+/* CHECKOUT */
+function openCheckout() {
+  if (!cart.length) return;
+  $('checkoutSubtotal').textContent = formatPrice(cart.reduce((s,i) => { const p = products.find(x=>String(x.id)===String(i.productId)); return s + (p ? p.price * i.quantity : 0); }, 0));
+  $('checkoutTotal').textContent = $('checkoutSubtotal').textContent;
+  $('checkoutModal').classList.remove('hidden');
+  $('checkoutModal').classList.add('flex');
+  openDialog($('checkoutModal'), $('checkoutBtn'));
+}
+function closeCheckout() {
+  $('checkoutModal').classList.add('hidden');
+  $('checkoutModal').classList.remove('flex');
+  closeDialog($('checkoutModal'), $('checkoutBtn'));
+}
+$('checkoutBtn').addEventListener('click', openCheckout);
+document.querySelectorAll('[data-close-checkout]').forEach(el => el.addEventListener('click', closeCheckout));
+$('applyPromoBtn').addEventListener('click', async () => {
+  const code = $('checkoutPromo').value.trim();
+  const msg = $('checkoutPromoMsg');
+  if (!code) { msg.textContent = t('checkout.promoEmpty'); msg.className = 'text-xs mt-1 text-red-600'; return; }
+  try {
+    const { data, error } = await sb.rpc('validate_promo', { p_code: code, p_user_id: null, p_subtotal: 0 });
+    if (error) throw error;
+    const row = Array.isArray(data) ? data[0] : data;
+    if (row && row.ok) {
+      activePromo = { code: row.code, type: row.type, value: Number(row.value) };
+      msg.textContent = `${t('checkout.promoApplied')}: ${row.code}`;
+      msg.className = 'text-xs mt-1 text-green-700 font-semibold';
+    } else {
+      activePromo = null;
+      msg.textContent = t('checkout.promoError');
+      msg.className = 'text-xs mt-1 text-red-600';
+    }
+  } catch (e) { console.error(e); msg.textContent = t('checkout.promoError'); msg.className = 'text-xs mt-1 text-red-600'; }
+});
+$('checkoutForm').addEventListener('submit', e => {
+  e.preventDefault();
+  showToast(t('checkout.success'));
+  cart = [];
+  saveCart(); renderCart();
+  closeCheckout();
+  setTimeout(closeCart, 200);
+});
+
+/* HOMEPAGE ACTIONS */
+function applyCategory(cat) {
+  document.querySelectorAll('#filter-category input').forEach(cb => cb.checked = false);
+  const vals = cat === 'kids' ? ['boys','girls'] : cat === 'men' ? ['men'] : cat === 'women' ? ['women'] : [];
+  vals.forEach(v => { const cb = document.querySelector(`#filter-category input[value="${v}"]`); if (cb) cb.checked = true; });
+  syncFilters();
+  renderProducts();
+  document.querySelector('#catalog').scrollIntoView({behavior:'smooth'});
+}
+document.querySelectorAll('[data-hero-category],[data-collection]').forEach(el => {
+  el.addEventListener('click', e => { e.preventDefault(); applyCategory(el.dataset.heroCategory || el.dataset.collection); });
+});
+document.querySelectorAll('[data-category]').forEach(link => {
+  link.addEventListener('click', e => { e.preventDefault(); applyCategory(link.dataset.category); });
+});
+
+/* LANGUAGE SWITCH */
+document.querySelectorAll('.lang-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    currentLang = btn.dataset.lang;
+    localStorage.setItem('lang', currentLang);
+    applyI18n();
+  });
+});
+
+/* FILTER EVENTS */
+document.querySelectorAll('#filter-category input, #filter-type input, #filter-season input').forEach(cb => {
+  cb.addEventListener('change', () => { syncFilters(); renderProducts(); });
+});
+$('searchInput').addEventListener('input', e => { filters.search = e.target.value; renderProducts(); });
+$('maxPrice').addEventListener('input', e => {
+  filters.maxPrice = Number(e.target.value);
+  $('maxPriceLabel').textContent = formatPrice(filters.maxPrice);
+  renderProducts();
+});
+$('sortSelect').addEventListener('change', e => { filters.sort = e.target.value; renderProducts(); });
+$('resetFilters').addEventListener('click', () => {
+  document.querySelectorAll('#filter-category input, #filter-type input, #filter-season input').forEach(cb => cb.checked = false);
+  $('searchInput').value = '';
+  $('maxPrice').value = MAX_PRICE;
+  filters = {search:'', categories:[], types:[], seasons:[], maxPrice:MAX_PRICE, sort:filters.sort};
+  $('maxPriceLabel').textContent = formatPrice(MAX_PRICE);
+  renderProducts();
+});
+
+/* PRODUCTS GRID DELEGATION */
+$('productsGrid').addEventListener('click', e => {
+  const fav = e.target.closest('[data-favorite]');
+  if (fav) {
+    const id = fav.dataset.favorite;
+    const i = favorites.indexOf(id);
+    if (i >= 0) { favorites.splice(i, 1); showToast(t('product.removedFavorite')); }
+    else { favorites.push(id); showToast(t('product.addedFavorite')); }
+    saveFavorites();
+    renderProducts();
+    return;
+  }
+  const view = e.target.closest('[data-product-view]');
+  if (view) { openProductModal(view.dataset.productView); return; }
+  const btn = e.target.closest('[data-add-to-cart]');
+  if (!btn) return;
+  const id = btn.dataset.addToCart;
+  const sizeSel = document.querySelector(`[data-size-select="${id}"]`);
+  addToCart(id, sizeSel ? sizeSel.value : '');
+});
+
+$('cartItemsContainer').addEventListener('click', e => {
+  const qtyBtn = e.target.closest('[data-qty]');
+  if (qtyBtn) { changeQty(qtyBtn.dataset.qty, qtyBtn.dataset.size, Number(qtyBtn.dataset.delta)); return; }
+  const remBtn = e.target.closest('[data-remove]');
+  if (remBtn) removeFromCart(remBtn.dataset.remove, remBtn.dataset.size);
+});
+
+/* SLIDER */
+function initSlider() {
+  const slides = Array.from(document.querySelectorAll('.slider-img'));
+  const dotsBox = $('sliderDots');
+  if (slides.length <= 1) return;
+  let index = 0;
+  slides.forEach((_, i) => {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'slider-dot';
+    b.setAttribute('aria-label', `Slide ${i+1}`);
+    b.setAttribute('aria-current', i === 0 ? 'true' : 'false');
+    b.addEventListener('click', () => goTo(i));
+    dotsBox.appendChild(b);
+  });
+  const dots = Array.from(dotsBox.children);
+  function goTo(next) {
+    slides[index].classList.remove('active');
+    dots[index].setAttribute('aria-current', 'false');
+    index = (next + slides.length) % slides.length;
+    slides[index].classList.add('active');
+    dots[index].setAttribute('aria-current', 'true');
+  }
+  $('sliderPrev')?.addEventListener('click', () => goTo(index - 1));
+  $('sliderNext')?.addEventListener('click', () => goTo(index + 1));
+  setInterval(() => goTo(index + 1), 5000);
+}
+
+/* INIT */
+async function init() {
+  renderSkeleton(6);
+  try {
+    products = await loadProducts();
+    console.log('✅ Загружено товаров:', products.length);
+  } catch (err) {
+    console.error('❌ Ошибка загрузки:', err);
+    $('productsGrid').innerHTML = `<div class="col-span-full text-center py-12 text-red-600">❌ Не удалось загрузить: ${escapeHtml(err.message || '')}</div>`;
+    return;
+  }
+  applyI18n();
+  renderProducts();
+  renderCart();
+  initSlider();
+}
+init();
+</script>
+</body>
+</html>
