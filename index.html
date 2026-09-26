@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Step Forward — Магазин</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+  body{font-family:system-ui,-apple-system,sans-serif;background:#f7f7f5}
+  .skel{background:linear-gradient(90deg,#eee 25%,#f5f5f5 37%,#eee 63%);background-size:400% 100%;animation:sk 1.4s ease infinite}
+  @keyframes sk{0%{background-position:100% 50%}100%{background-position:0 50%}}
+</style>
+</head>
+<body class="text-gray-800 min-h-screen">
+
+<nav class="fixed top-0 w-full bg-white shadow-sm z-40">
+  <div class="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
+    <a href="#" class="font-black text-xl tracking-tight">STEP<span class="text-orange-600">FORWARD</span></a>
+    <div class="flex items-center gap-2">
+      <div class="flex border rounded overflow-hidden text-xs font-bold">
+        <button class="lang px-2 py-1" data-lang="uk">UK</button>
+        <button class="lang px-2 py-1 border-l border-r" data-lang="ru">RU</button>
+        <button class="lang px-2 py-1" data-lang="en">EN</button>
+      </div>
+      <button id="cartBtn" class="relative p-2 hover:text-orange-700">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/></svg>
+        <span id="cartBadge" class="absolute top-0 right-0 bg-orange-600 text-white text-[10px] font-bold w-4 h-4 rounded-full hidden items-center justify-center">0</span>
+      </button>
+    </div>
+  </div>
+</nav>
+
+<header class="mt-16 h-72 md:h-96 bg-zinc-900 relative overflow-hidden">
+  <img src="https://images.unsplash.com/photo-1542291026-7eec264c27ff?q=80&w=1600&auto=format&fit=crop" class="w-full h-full object-cover opacity-60" alt="">
+  <div class="absolute inset-0 flex items-center justify-center">
+    <h1 class="text-4xl md:text-7xl font-black text-white uppercase tracking-widest text-center drop-shadow-2xl" data-i18n="hero">YOUR PATH.<br>YOUR ELEMENT.</h1>
+  </div>
+</header>
+
+<main class="max-w-7xl mx-auto px-4 py-10">
+  <h2 class="text-2xl font-black uppercase mb-1" data-i18n="catalog">Каталог</h2>
+  <p id="count" class="text-sm text-gray-500 mb-6"></p>
+  <div id="grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+</main>
+
+<footer class="bg-zinc-900 text-white py-8 text-center text-sm">
+  <span class="font-black text-xl">STEP<span class="text-orange-500">FORWARD</span></span>
+  <p class="text-gray-500 mt-2">© 2026 Step Forward</p>
+</footer>
+
+<div id="cartBackdrop" class="fixed inset-0 bg-black/50 z-50 hidden"></div>
+<aside id="cartPanel" class="fixed top-0 right-0 w-full sm:w-96 h-full bg-white z-50 shadow-2xl transform translate-x-full transition-transform flex flex-col">
+  <div class="p-4 border-b flex justify-between items-center bg-gray-50">
+    <h3 class="font-bold text-lg" data-i18n="cart">Кошик</h3>
+    <button id="cartClose" class="text-2xl text-gray-500 px-2">×</button>
+  </div>
+  <div id="cartItems" class="flex-1 overflow-y-auto p-4 space-y-3"></div>
+  <div class="p-4 border-t bg-gray-50">
+    <div class="flex justify-between mb-3"><span class="font-semibold" data-i18n="total">Разом:</span><span id="cartTotal" class="font-bold text-lg">0 ₴</span></div>
+    <button id="checkout" class="w-full bg-orange-600 hover:bg-orange-700 text-white font-bold py-3 rounded-lg disabled:bg-gray-300" data-i18n="checkout">Оформити</button>
+  </div>
+</aside>
+
+<div id="toast" class="fixed bottom-5 right-5 bg-zinc-900 text-white px-5 py-3 rounded shadow-lg opacity-0 translate-y-20 transition-all z-50"></div>
+
+<script>
+const SB_URL = 'https://wxsivaeddadjotewtvhv.supabase.co';
+const SB_KEY = 'sb_publishable_WTvrym-NaOP1BEEK0XaM1A_5pzM9Dmc';
+const sb = supabase.createClient(SB_URL, SB_KEY);
+
+const I18N = {
+  uk:{hero:'ТВІЙ ШЛЯХ.<br>ТВОЯ СТИХІЯ.',catalog:'Каталог',cart:'Кошик',total:'Разом:',checkout:'Оформити',empty:'Кошик порожній',add:'У кошик',size:'Розмір',select:'Оберіть розмір',added:'Додано до кошика',removed:'Видалено',placed:'Замовлення прийнято! (Демо)',count:'Знайдено товарів:',cur:'₴',loc:'uk-UA'},
+  ru:{hero:'ТВОЙ ПУТЬ.<br>ТВОЯ СТИХИЯ.',catalog:'Каталог',cart:'Корзина',total:'Итого:',checkout:'Оформить',empty:'Корзина пуста',add:'В корзину',size:'Размер',select:'Выберите размер',added:'Добавлено в корзину',removed:'Удалено',placed:'Заказ принят! (Демо)',count:'Найдено товаров:',cur:'₴',loc:'ru-UA'},
+  en:{hero:'YOUR PATH.<br>YOUR ELEMENT.',catalog:'Catalog',cart:'Cart',total:'Total:',checkout:'Checkout',empty:'Cart is empty',add:'Add to cart',size:'Size',select:'Select size',added:'Added to cart',removed:'Removed',placed:'Order placed! (Demo)',count:'Products found:',cur:'₴',loc:'uk-UA'}
+};
+let lang = localStorage.getItem('lang') || 'uk';
+if(!I18N[lang]) lang = 'uk';
+
+const t = (k) => (I18N[lang][k] || I18N.uk[k] || k);
+const fmt = (v) => v.toLocaleString(I18N[lang].loc) + ' ' + t('cur');
+const esc = (s) => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+
+let products = [];
+let cart = [];
+try { cart = JSON.parse(localStorage.getItem('cart') || '[]'); } catch(e){ cart = []; }
+const saveCart = () => localStorage.setItem('cart', JSON.stringify(cart));
+
+function productName(p){ return (p.names && (p.names[lang] || p.names.uk || p.names.en)) || p.slug; }
+
+function mapRow(r){
+  const names = {};
+  (r.product_translations||[]).forEach(t => names[t.lang] = t.name);
+  const imgs = [...(r.product_images||[])].sort((a,b)=>(a.position||0)-(b.position||0));
+  const sizes = [...(r.product_sizes||[])].filter(s=>s.stock>0).map(s=>s.size_value).sort((a,b)=>a-b);
+  return {
+    id: r.id, slug: r.slug, category: r.category, type: r.type, season: r.season,
+    price: r.price_kopecks / 100,
+    img: imgs[0] ? imgs[0].url : '',
+    sizes: sizes.length ? sizes : [40,41,42,43],
+    names
+  };
+}
+
+async function loadProducts(){
+  const { data, error } = await sb.from('products')
+    .select('id,slug,category,type,season,price_kopecks,product_translations(lang,name),product_images(url,position),product_sizes(size_value,stock)')
+    .eq('is_published', true)
+    .order('created_at', { ascending: false });
+  if (error) throw error;
+  return (data||[]).map(mapRow);
+}
+
+function render(){
+  document.querySelectorAll('[data-i18n]').forEach(el=>{ el.innerHTML = t(el.dataset.i18n); });
+  document.querySelectorAll('.lang').forEach(b => {
+    const a = b.dataset.lang === lang;
+    b.classList.toggle('bg-orange-600', a);
+    b.classList.toggle('text-white', a);
+  });
+  document.getElementById('count').textContent = t('count') + ' ' + products.length;
+  document.getElementById('grid').innerHTML = products.map(p => {
+    const name = esc(productName(p));
+    return `
+      <article class="bg-white rounded-xl border border-gray-100 overflow-hidden hover:shadow-lg transition">
+        <div class="aspect-square bg-gray-100">
+          ${p.img ? `<img src="${esc(p.img)}" alt="${name}" loading="lazy" class="w-full h-full object-cover">` : ''}
+        </div>
+        <div class="p-4">
+          <div class="text-xs uppercase text-gray-500">${p.category} · ${p.type}</div>
+          <h3 class="font-bold mt-1 mb-3">${name}</h3>
+          <select data-size="${p.id}" class="w-full mb-3 px-3 py-2 border rounded-lg text-sm">
+            <option value="">${t('select')}</option>
+            ${p.sizes.map(s => `<option value="${s}">${t('size')} ${s}</option>`).join('')}
+          </select>
+          <div class="flex justify-between items-center">
+            <span class="font-black text-lg">${fmt(p.price)}</span>
+            <button data-add="${p.id}" class="bg-zinc-900 hover:bg-orange-600 text-white text-sm font-semibold px-3 py-2 rounded-lg">+ ${t('add')}</button>
+          </div>
+        </div>
+      </article>`;
+  }).join('');
+  renderCart();
+}
+
+function renderCart(){
+  const total = cart.reduce((s,i)=>s+i.quantity,0);
+  const badge = document.getElementById('cartBadge');
+  badge.textContent = total;
+  badge.classList.toggle('hidden', total === 0);
+  badge.classList.toggle('flex', total > 0);
+
+  const box = document.getElementById('cartItems');
+  if (!cart.length){ box.innerHTML = `<p class="text-center text-gray-400 py-10">${t('empty')}</p>`; document.getElementById('cartTotal').textContent = fmt(0); document.getElementById('checkout').disabled = true; return; }
+  document.getElementById('checkout').disabled = false;
+
+  let sum = 0;
+  box.innerHTML = cart.map(item => {
+    const p = products.find(x => String(x.id) === String(item.productId));
+    if (!p) return '';
+    sum += p.price * item.quantity;
+    return `
+      <div class="flex gap-3 items-center bg-gray-50 p-3 rounded-lg">
+        ${p.img ? `<img src="${esc(p.img)}" class="w-14 h-14 object-cover rounded">` : ''}
+        <div class="flex-1 min-w-0">
+          <div class="text-sm font-bold truncate">${esc(productName(p))}</div>
+          <div class="text-xs text-gray-500">${t('size')}: ${esc(item.size)}</div>
+          <div class="text-orange-700 text-sm font-bold">${fmt(p.price)}</div>
+        </div>
+        <div class="flex flex-col items-end gap-1">
+          <button data-rm="${p.id}|${esc(item.size)}" class="text-red-500 text-lg">×</button>
+          <div class="flex items-center gap-1 text-sm">
+            <button data-qty="${p.id}|${esc(item.size)}|-1" class="w-6 h-6 bg-gray-200 rounded">−</button>
+            <span class="w-5 text-center font-bold">${item.quantity}</span>
+            <button data-qty="${p.id}|${esc(item.size)}|1" class="w-6 h-6 bg-gray-200 rounded">+</button>
+          </div>
+        </div>
+      </div>`;
+  }).join('');
+  document.getElementById('cartTotal').textContent = fmt(sum);
+}
+
+function toast(msg){
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.remove('opacity-0','translate-y-20');
+  clearTimeout(el._t);
+  el._t = setTimeout(()=>el.classList.add('opacity-0','translate-y-20'), 2200);
+}
+
+function addToCart(id, size){
+  if (!size){ toast(t('select')); return; }
+  const key = String(id) + '::' + size;
+  const ex = cart.find(i => String(i.productId)+'::'+i.size === key);
+  if (ex) ex.quantity += 1;
+  else cart.push({ productId: String(id), size, quantity: 1 });
+  saveCart(); renderCart(); toast(t('added'));
+}
+
+function changeQty(key, delta){
+  const [id, size] = key.split('|');
+  const k = String(id)+'::'+size;
+  const i = cart.findIndex(x => String(x.productId)+'::'+x.size === k);
+  if (i === -1) return;
+  cart[i].quantity += delta;
+  if (cart[i].quantity <= 0) cart.splice(i, 1);
+  saveCart(); renderCart();
+}
+
+function removeItem(key){
+  const [id, size] = key.split('|');
+  const k = String(id)+'::'+size;
+  cart = cart.filter(x => String(x.productId)+'::'+x.size !== k);
+  saveCart(); renderCart(); toast(t('removed'));
+}
+
+function openCart(){
+  document.getElementById('cartPanel').classList.remove('translate-x-full');
+  document.getElementById('cartBackdrop').classList.remove('hidden');
+}
+function closeCart(){
+  document.getElementById('cartPanel').classList.add('translate-x-full');
+  document.getElementById('cartBackdrop').classList.add('hidden');
+}
+
+document.getElementById('grid').addEventListener('click', e => {
+  const btn = e.target.closest('[data-add]');
+  if (!btn) return;
+  const id = btn.dataset.add;
+  const size = document.querySelector(`[data-size="${id}"]`).value;
+  addToCart(id, size);
+});
+
+document.getElementById('cartItems').addEventListener('click', e => {
+  const rm = e.target.closest('[data-rm]');
+  if (rm) return removeItem(rm.dataset.rm);
+  const q = e.target.closest('[data-qty]');
+  if (q){ const [k, d] = [q.dataset.qty, Number(q.dataset.qty.split('|')[2])]; changeQty(q.dataset.qty, d); }
+});
+
+document.querySelectorAll('.lang').forEach(b => b.addEventListener('click', () => {
+  lang = b.dataset.lang; localStorage.setItem('lang', lang); render();
+}));
+
+document.getElementById('cartBtn').addEventListener('click', openCart);
+document.getElementById('cartClose').addEventListener('click', closeCart);
+document.getElementById('cartBackdrop').addEventListener('click', closeCart);
+
+document.getElementById('checkout').addEventListener('click', () => {
+  toast(t('placed'));
+  cart = []; saveCart(); renderCart();
+  setTimeout(closeCart, 500);
+});
+
+async function init(){
+  document.getElementById('grid').innerHTML = Array.from({length:6}, () =>
+    `<div class="bg-white rounded-xl overflow-hidden"><div class="aspect-square skel"></div><div class="p-4 space-y-2"><div class="h-3 w-1/3 skel rounded"></div><div class="h-4 w-3/4 skel rounded"></div><div class="h-10 skel rounded"></div></div></div>`
+  ).join('');
+  try {
+    products = await loadProducts();
+    render();
+    console.log('✅ Товаров:', products.length);
+  } catch(err){
+    console.error(err);
+    document.getElementById('grid').innerHTML = `<p class="col-span-full text-red-600 text-center py-10">❌ Не удалось загрузить товары: ${esc(err.message)}</p>`;
+  }
+}
+init();
+</script>
+</body>
+</html>
